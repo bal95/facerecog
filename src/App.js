@@ -17,12 +17,12 @@ const MODEL_ID = 'face-detection';
 const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5';
 
 const particlesInit = async (main) => {
-  console.log(main);
+  //console.log(main);
   await loadFull(main);
 }
 
 const particlesLoaded = (container) => {
-  console.log(container);
+  //console.log(container);
 }
 
 const particlesOptions={
@@ -101,7 +101,32 @@ class App extends Component{
       box:{},
       route:'signin',
       isSignedIn:false,
+      user:{
+        id:'',
+        name: '',
+        email:'',
+        password:'',
+        entries:0,
+        joined:'',
+      }
     }
+  }
+
+  loadUser=(data)=>{
+    this.setState({user:{
+      id:data.id,
+      name: data.name,
+      email:data.email,
+      password:data.password,
+      entries:data.entries,
+      joined:data.joined,
+    }})
+  }
+
+  componentDidMount(){
+    fetch('http://localhost:4000')
+      .then(res=>res.json())
+      .then(data=>console.log(data))
   }
 
   calculateFaceLocation=(faceData)=>{
@@ -148,8 +173,25 @@ class App extends Component{
         },
         body: raw
     }
+    
     fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
-      .then(response => response.json())
+      .then(response => {
+        if(response){
+          fetch('http://localhost:4000/image',{
+            method:'put',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              id:this.state.user.id,
+            })
+            }
+          )
+            .then(res => res.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user,{entries:count}))
+            })
+        }
+        return response.json()
+      })
       .then(result => this.displayFaceBox(this.calculateFaceLocation(result.outputs[0].data.regions[0].region_info.bounding_box)))
       .catch(error => console.log('error', error));
   }
@@ -169,12 +211,12 @@ class App extends Component{
         {route==='home'?
           <div>
             <Logo/>
-            <Rank/>
+            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onSubmit}/>
             <FaceRecognition imageUrl={imageUrl} box={box}/>
           </div>:(
-            route==='signin'?<Signin onRouteChange={this.onRouteChange}/>
-            :<Register onRouteChange={this.onRouteChange}/>
+            route==='signin'?<Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+            :<Register onRouteChange={this.onRouteChange} loadUser={this.loadUser}/>
           )
         }
       </div>
