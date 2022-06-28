@@ -1,5 +1,7 @@
 import React from "react";
 
+const DATABASE_URL=
+
 class Register extends React.Component{
     constructor(props){
         super(props)
@@ -23,7 +25,7 @@ class Register extends React.Component{
     }
 
     onSubmitRegister=()=>{
-        fetch('https://floating-wildwood-96682.herokuapp.com/register',{
+        fetch(DATABASE_URL+'register',{
             method:'post',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
