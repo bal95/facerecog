@@ -8,11 +8,13 @@ import Signin from './components/Signin/Signin'
 import Register from './components/Register/Register'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 
-const USER_ID = 'bal95';
-const PAT = 'ddc34060d7024141a7b146aea29d23e0';
-const APP_ID = 'f72258ad3e344ef488530c0764ded98b';
-const MODEL_ID = 'face-detection';
-const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5';
+// Get your own user credentials from Clarifai API
+const USER_ID = 
+const PAT = 
+const APP_ID = 
+const MODEL_ID = 'face-detection'
+const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5'
+const DATABASE_URL = 
 
 const initialState={
   imageUrl:'',
@@ -47,7 +49,7 @@ class App extends Component{
   }
 
   componentDidMount(){
-    fetch('https://floating-wildwood-96682.herokuapp.com/')
+    fetch(DATABASE_URL)
       .then(res=>res.json())
       .then(data=>console.log(data))
   }
@@ -100,7 +102,7 @@ class App extends Component{
     fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
       .then(response => {
         if(response){
-          fetch('https://floating-wildwood-96682.herokuapp.com/image',{
+          fetch(DATABASE_URL+'image',{
             method:'put',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
